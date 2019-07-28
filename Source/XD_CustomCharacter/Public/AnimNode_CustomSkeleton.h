@@ -24,7 +24,13 @@ public:
 		TArray<TKeyValuePair<FVector, int32>> ScaleModifies;
 	};
 
+	struct FCustomSkeletonRuntimeNoChildEntry : public FCustomSkeletonRuntimeEntry
+	{
+		TArray<int32> ChildBones;
+	};
+
 	TArray<FCustomSkeletonRuntimeEntry> CustomBoneDatas;
+	TArray<FCustomSkeletonRuntimeNoChildEntry> CustomBoneNoChildDatas;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Links)
 	FPoseLink BasePose;

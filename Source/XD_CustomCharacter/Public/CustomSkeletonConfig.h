@@ -76,6 +76,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = "骨架定制")
 	float Scale = 1.f;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "骨架定制")
+	uint8 bNotEffectChildBone : 1;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "骨架定制")
 	float DefalutValue;
 
 	FText GetBonesDesc() const;
