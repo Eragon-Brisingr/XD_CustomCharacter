@@ -73,20 +73,20 @@ void FAnimNode_CustomSkeleton::Update_AnyThread(const FAnimationUpdateContext& C
 					{
 						continue;
 					}
-					FCustomSkeletonRuntimeNoChildEntry& Entry = CustomBoneNoChildDatas[Index];
+				}
+				FCustomSkeletonRuntimeNoChildEntry& Entry = CustomBoneNoChildDatas[Index];
 
-					switch (BoneData.Mode)
-					{
-					case ECustomSkeletonMode::Offset:
-						Entry.OffsetModifies.Add({ BoneData.ApplyAxis.GetSafeNormal(), Idx });
-						break;
-					case ECustomSkeletonMode::Scale:
-						Entry.ScaleModifies.Add({ BoneData.ApplyAxis.GetSafeNormal(), Idx });
-						break;
-					case ECustomSkeletonMode::Rotation:
-						Entry.RotationModifies.Add({ BoneData.ApplyAxis.GetSafeNormal(), Idx });
-						break;
-					}
+				switch (BoneData.Mode)
+				{
+				case ECustomSkeletonMode::Offset:
+					Entry.OffsetModifies.Add({ BoneData.ApplyAxis.GetSafeNormal(), Idx });
+					break;
+				case ECustomSkeletonMode::Scale:
+					Entry.ScaleModifies.Add({ BoneData.ApplyAxis.GetSafeNormal(), Idx });
+					break;
+				case ECustomSkeletonMode::Rotation:
+					Entry.RotationModifies.Add({ BoneData.ApplyAxis.GetSafeNormal(), Idx });
+					break;
 				}
 			}
 		}
@@ -205,7 +205,8 @@ void FAnimNode_CustomSkeleton::Evaluate_AnyThread(FPoseContext& Output)
 				for (int32 ChildBoneIdx : Entry.ChildBones)
 				{
 					FTransform& ChildBoneTM = Output.Pose[FCompactPoseBoneIndex(ChildBoneIdx)];
-					ChildBoneTM.SetScale3D(ChildBoneTM.GetScale3D() - Scale / 2.f);
+					FVector ClildScale3D = ChildBoneTM.GetScale3D();
+					ChildBoneTM.SetScale3D(ClildScale3D / (ClildScale3D + Scale));
 				}
 				NewBoneTM.SetScale3D(NewBoneTM.GetScale3D() + Scale);
 			}
@@ -221,7 +222,7 @@ void FAnimNode_CustomSkeleton::Evaluate_AnyThread(FPoseContext& Output)
 				for (int32 ChildBoneIdx : Entry.ChildBones)
 				{
 					FTransform& ChildBoneTM = Output.Pose[FCompactPoseBoneIndex(ChildBoneIdx)];
-					ChildBoneTM.SetRotation(ChildBoneTM.GetRotation() * Rotation);
+					ChildBoneTM.SetRotation(Rotation.Inverse() * ChildBoneTM.GetRotation());
 				}
 				NewBoneTM.SetRotation(Rotation * NewBoneTM.GetRotation());
 			}
