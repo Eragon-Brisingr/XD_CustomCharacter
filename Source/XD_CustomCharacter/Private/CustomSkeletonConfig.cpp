@@ -158,28 +158,30 @@ void FCustomCharacterRuntimeData::ApplyMaterialFloatValues(USkeletalMeshComponen
 
 	for (const auto& IdAndData : ColorData)
 	{
-		UMaterialInstanceDynamic* MaterialInstanceDynamic = GetMID(SkeletalMeshComponent, IdAndData.Key);
-		for (const auto& ParameterNameAndData : IdAndData.Value)
+		if (UMaterialInstanceDynamic* MaterialInstanceDynamic = GetMID(SkeletalMeshComponent, IdAndData.Key))
 		{
-			FLinearColor Color = MaterialInstanceDynamic->K2_GetVectorParameterValue(ParameterNameAndData.Key);
-			const FLinearColorTypeData& Data = ParameterNameAndData.Value;
-			if (Data.IdxR != INDEX_NONE)
+			for (const auto& ParameterNameAndData : IdAndData.Value)
 			{
-				Color.R = CustomMaterialFloatValues[Data.IdxR];
+				FLinearColor Color = MaterialInstanceDynamic->K2_GetVectorParameterValue(ParameterNameAndData.Key);
+				const FLinearColorTypeData& Data = ParameterNameAndData.Value;
+				if (Data.IdxR != INDEX_NONE)
+				{
+					Color.R = CustomMaterialFloatValues[Data.IdxR];
+				}
+				if (Data.IdxG != INDEX_NONE)
+				{
+					Color.G = CustomMaterialFloatValues[Data.IdxG];
+				}
+				if (Data.IdxB != INDEX_NONE)
+				{
+					Color.B = CustomMaterialFloatValues[Data.IdxB];
+				}
+				if (Data.IdxA != INDEX_NONE)
+				{
+					Color.A = CustomMaterialFloatValues[Data.IdxA];
+				}
+				MaterialInstanceDynamic->SetVectorParameterValue(ParameterNameAndData.Key, Color);
 			}
-			if (Data.IdxG != INDEX_NONE)
-			{
-				Color.G = CustomMaterialFloatValues[Data.IdxG];
-			}
-			if (Data.IdxB != INDEX_NONE)
-			{
-				Color.B = CustomMaterialFloatValues[Data.IdxB];
-			}
-			if (Data.IdxA != INDEX_NONE)
-			{
-				Color.A = CustomMaterialFloatValues[Data.IdxA];
-			}
-			MaterialInstanceDynamic->SetVectorParameterValue(ParameterNameAndData.Key, Color);
 		}
 	}
 }
@@ -196,7 +198,10 @@ void FCustomCharacterRuntimeData::ApplyMaterialColorValues(USkeletalMeshComponen
 		const FCustomMaterialColorEntry& Entry = CustomConfig->MaterialColorData[Idx];
 		for (const FCustomMaterialColorData& CustomMaterialColorData : Entry.CustomMaterialColorDatas)
 		{
-			GetMID(SkeletalMeshComponent, CustomMaterialColorData.SlotId)->SetVectorParameterValue(CustomMaterialColorData.ParameterName, CustomMaterialColorValues[Idx]);
+			if (UMaterialInstanceDynamic* MaterialInstanceDynamic = GetMID(SkeletalMeshComponent, CustomMaterialColorData.SlotId))
+			{
+				MaterialInstanceDynamic->SetVectorParameterValue(CustomMaterialColorData.ParameterName, CustomMaterialColorValues[Idx]);
+			}
 		}
 	}
 }
@@ -213,7 +218,10 @@ void FCustomCharacterRuntimeData::ApplyMaterialTextureValues(USkeletalMeshCompon
 		const FCustomMaterialTextureEntry& Entry = CustomConfig->MaterialTextureData[Idx];
 		for (const FCustomMaterialTextureData& CustomMaterialColorData : Entry.CustomMaterialTextureDatas)
 		{
-			GetMID(SkeletalMeshComponent, CustomMaterialColorData.SlotId)->SetTextureParameterValue(CustomMaterialColorData.ParameterName, CustomMaterialTextureValues[Idx]);
+			if (UMaterialInstanceDynamic* MaterialInstanceDynamic = GetMID(SkeletalMeshComponent, CustomMaterialColorData.SlotId))
+			{
+				MaterialInstanceDynamic->SetTextureParameterValue(CustomMaterialColorData.ParameterName, CustomMaterialTextureValues[Idx]);
+			}
 		}
 	}
 }
