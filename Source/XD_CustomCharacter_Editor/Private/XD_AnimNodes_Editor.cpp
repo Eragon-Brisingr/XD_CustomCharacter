@@ -1,7 +1,7 @@
 // Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
 #include "XD_CustomCharacter_Editor.h"
-#include "PropertyEditorModule.h"
+#include <PropertyEditorModule.h>
 #include "XD_PropertyCustomizationEx.h"
 
 #define LOCTEXT_NAMESPACE "FXD_CustomCharacter_EditorModule"

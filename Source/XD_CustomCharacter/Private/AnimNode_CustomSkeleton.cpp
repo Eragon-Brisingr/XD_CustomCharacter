@@ -2,8 +2,8 @@
 
 
 #include "AnimNode_CustomSkeleton.h"
-#include "AnimationRuntime.h"
-#include "AnimInstanceProxy.h"
+#include <AnimationRuntime.h>
+#include <Animation/AnimInstanceProxy.h>
 
 void FAnimNode_CustomSkeleton::Initialize_AnyThread(const FAnimationInitializeContext& Context)
 {

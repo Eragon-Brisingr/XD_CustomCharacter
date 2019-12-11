@@ -1,17 +1,18 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "CustomCharacterRuntimeData_Customization.h"
-#include "DetailWidgetRow.h"
-#include "CustomSkeletonConfig.h"
-#include "STextBlock.h"
-#include "SNumericEntryBox.h"
-#include "IDetailChildrenBuilder.h"
-#include "IDetailGroup.h"
-#include "IDetailPropertyRow.h"
-#include "SButton.h"
+#include <DetailWidgetRow.h>
+#include <Widgets/Text/STextBlock.h>
+#include <Widgets/Input/SNumericEntryBox.h>
+#include <IDetailChildrenBuilder.h>
+#include <IDetailGroup.h>
+#include <IDetailPropertyRow.h>
+#include <Widgets/Input/SButton.h>
+#include <Engine/Texture.h>
+#include <PropertyCustomizationHelpers.h>
+
 #include "XD_PropertyCustomizationEx.h"
-#include "Engine/Texture.h"
-#include "PropertyCustomizationHelpers.h"
+#include "CustomSkeletonConfig.h"
 
 #define LOCTEXT_NAMESPACE "CustomCharacterRuntimeData_Customization"
 

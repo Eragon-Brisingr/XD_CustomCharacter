@@ -2,7 +2,7 @@
 
 
 #include "CustomSkeletonConfig.h"
-#include "Components/SkeletalMeshComponent.h"
+#include <Components/SkeletalMeshComponent.h>
 #include "Materials/MaterialInstanceDynamic.h"
 
 FText FCustomSkeletonEntry::GetBonesDesc() const

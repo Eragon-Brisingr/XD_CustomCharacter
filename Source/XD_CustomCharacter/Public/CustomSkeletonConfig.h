@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Engine/DataAsset.h"
+#include <Engine/DataAsset.h>
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "CustomSkeletonConfig.generated.h"
 
