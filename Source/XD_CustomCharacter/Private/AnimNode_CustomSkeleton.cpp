@@ -5,6 +5,8 @@
 #include <AnimationRuntime.h>
 #include <Animation/AnimInstanceProxy.h>
 
+#include "CustomSkeletonConfig.h"
+
 void FAnimNode_CustomSkeleton::Initialize_AnyThread(const FAnimationInitializeContext& Context)
 {
 	BasePose.Initialize(Context);
@@ -33,98 +35,38 @@ void FAnimNode_CustomSkeleton::Update_AnyThread(const FAnimationUpdateContext& C
 	for (int32 Idx = 0; Idx < CustomCharacterRuntimeDataRef->CustomConfig->SkeletonData.Num(); ++Idx)
 	{
 		const FCustomSkeletonEntry& CustomSkeletonEntry = CustomCharacterRuntimeDataRef->CustomConfig->SkeletonData[Idx];
-		if (CustomSkeletonEntry.bNotEffectChildBone)
+		for (const FCustomSkeletonBoneData& BoneData : CustomSkeletonEntry.BoneDatas)
 		{
-			for (const FCustomSkeletonBoneData& BoneData : CustomSkeletonEntry.BoneDatas)
+			const FName& BoneName = BoneData.BoneName;
+
+			int32 Index = CustomBoneDatas.IndexOfByPredicate([&](const FCustomSkeletonRuntimeEntry& E) {return E.BoneReference.BoneName == BoneName; });
+			if (Index == INDEX_NONE)
 			{
-				const FName& BoneName = BoneData.BoneName;
-
-				int32 Index = CustomBoneNoChildDatas.IndexOfByPredicate([&](const FCustomSkeletonRuntimeNoChildEntry& E) {return E.BoneReference.BoneName == BoneName; });
-				if (Index == INDEX_NONE)
+				FBoneReference BoneReferences(BoneName);
+				if (BoneReferences.Initialize(RequiredBones))
 				{
-					FBoneReference BoneReference(BoneName);
-					if (BoneReference.Initialize(RequiredBones))
-					{
-						FCustomSkeletonRuntimeNoChildEntry CustomSkeletonRuntimeEntry;
-						CustomSkeletonRuntimeEntry.BoneReference = BoneReference;
-
-						struct FBoneHelper
-						{
-							static void GetDirectChildBones(const FReferenceSkeleton& ReferenceSkeleton, int32 ParentBoneIndex, TArray<int32>& Children)
-							{
-								Children.Reset();
-
-								const int32 NumBones = ReferenceSkeleton.GetNum();
-								for (int32 ChildIndex = ParentBoneIndex + 1; ChildIndex < NumBones; ChildIndex++)
-								{
-									if (ParentBoneIndex == ReferenceSkeleton.GetParentIndex(ChildIndex))
-									{
-										Children.Add(ChildIndex);
-									}
-								}
-							}
-						};
-
-						FBoneHelper::GetDirectChildBones(RequiredBones.GetReferenceSkeleton(), BoneReference.BoneIndex, CustomSkeletonRuntimeEntry.ChildBones);
-
-						Index = CustomBoneNoChildDatas.Add(CustomSkeletonRuntimeEntry);
-					}
-					else
-					{
-						continue;
-					}
+					FCustomSkeletonRuntimeEntry CustomSkeletonRuntimeEntry;
+					CustomSkeletonRuntimeEntry.BoneReference = BoneReferences;
+					Index = CustomBoneDatas.Add(CustomSkeletonRuntimeEntry);
 				}
-				FCustomSkeletonRuntimeNoChildEntry& Entry = CustomBoneNoChildDatas[Index];
-
-				switch (BoneData.Mode)
+				else
 				{
-				case ECustomSkeletonMode::Offset:
-					Entry.OffsetModifies.Add({ BoneData.ApplyAxis.GetSafeNormal(), Idx });
-					break;
-				case ECustomSkeletonMode::Scale:
-					Entry.ScaleModifies.Add({ BoneData.ApplyAxis.GetSafeNormal(), Idx });
-					break;
-				case ECustomSkeletonMode::Rotation:
-					Entry.RotationModifies.Add({ BoneData.ApplyAxis.GetSafeNormal(), Idx });
-					break;
+					continue;
 				}
 			}
-		}
-		else
-		{
-			for (const FCustomSkeletonBoneData& BoneData : CustomSkeletonEntry.BoneDatas)
+			FCustomSkeletonRuntimeEntry& Entry = CustomBoneDatas[Index];
+
+			switch (BoneData.Mode)
 			{
-				const FName& BoneName = BoneData.BoneName;
-
-				int32 Index = CustomBoneDatas.IndexOfByPredicate([&](const FCustomSkeletonRuntimeEntry& E) {return E.BoneReference.BoneName == BoneName; });
-				if (Index == INDEX_NONE)
-				{
-					FBoneReference BoneReferences(BoneName);
-					if (BoneReferences.Initialize(RequiredBones))
-					{
-						FCustomSkeletonRuntimeEntry CustomSkeletonRuntimeEntry;
-						CustomSkeletonRuntimeEntry.BoneReference = BoneReferences;
-						Index = CustomBoneDatas.Add(CustomSkeletonRuntimeEntry);
-					}
-					else
-					{
-						continue;
-					}
-				}
-				FCustomSkeletonRuntimeEntry& Entry = CustomBoneDatas[Index];
-
-				switch (BoneData.Mode)
-				{
-				case ECustomSkeletonMode::Offset:
-					Entry.OffsetModifies.Add({ BoneData.ApplyAxis.GetSafeNormal(), Idx });
-					break;
-				case ECustomSkeletonMode::Scale:
-					Entry.ScaleModifies.Add({ BoneData.ApplyAxis.GetSafeNormal(), Idx });
-					break;
-				case ECustomSkeletonMode::Rotation:
-					Entry.RotationModifies.Add({ BoneData.ApplyAxis.GetSafeNormal(), Idx });
-					break;
-				}
+			case ECustomSkeletonMode::Offset:
+				Entry.OffsetModifies.Add({ BoneData.ApplyAxis, Idx });
+				break;
+			case ECustomSkeletonMode::Scale:
+				Entry.ScaleModifies.Add({ BoneData.ApplyAxis, Idx });
+				break;
+			case ECustomSkeletonMode::Rotation:
+				Entry.RotationModifies.Add({ BoneData.ApplyAxis, Idx });
+				break;
 			}
 		}
 	}
