@@ -1,7 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "CustomSkeletonConfig.h"
+#include "XD_CustomSkeletalConfig.h"
 #include <Components/SkeletalMeshComponent.h>
 #include "Materials/MaterialInstanceDynamic.h"
 
@@ -30,7 +30,7 @@ namespace
 	bool operator==(const FText& LHS, const FText& RHS) { return LHS.EqualTo(RHS); }
 }
 
-TArray<FText> UCustomCharacterConfig::GetAllCategoryNames() const
+TArray<FText> UXD_CustomSkeletalConfig::GetAllCategoryNames() const
 {
 	TArray<FText> TempRes;
 	for (const FCustomSkeletonEntry& Entry : SkeletonData)
@@ -57,7 +57,7 @@ TArray<FText> UCustomCharacterConfig::GetAllCategoryNames() const
 	return TempRes;
 }
 
-void FCustomCharacterRuntimeData::SetCustomCharacterRuntimeData(const FCustomCharacterRuntimeData& NewCustomCharacterRuntimeData)
+void FXD_CustomSkeletalRuntimeData::SetCustomCharacterRuntimeData(const FXD_CustomSkeletalRuntimeData& NewCustomCharacterRuntimeData)
 {
 	if (CustomConfig != NewCustomCharacterRuntimeData.CustomConfig)
 	{
@@ -65,7 +65,17 @@ void FCustomCharacterRuntimeData::SetCustomCharacterRuntimeData(const FCustomCha
 	}
 }
 
-void FCustomCharacterRuntimeData::SyncConfigData(UCustomCharacterConfig* OldCustomConfig)
+void FXD_CustomSkeletalRuntimeData::SetCustomConfig(UXD_CustomSkeletalConfig* NewCustomConfig)
+{
+	if (CustomConfig != NewCustomConfig)
+	{
+		UXD_CustomSkeletalConfig* OldCustomConfig = CustomConfig;
+		CustomConfig = NewCustomConfig;
+		SyncConfigData(OldCustomConfig);
+	}
+}
+
+void FXD_CustomSkeletalRuntimeData::SyncConfigData(UXD_CustomSkeletalConfig* OldCustomConfig)
 {
 	if (CustomConfig)
 	{
@@ -177,31 +187,31 @@ void FCustomCharacterRuntimeData::SyncConfigData(UCustomCharacterConfig* OldCust
 	}
 }
 
-float FCustomCharacterRuntimeData::GetCustomSkeletonValue(int32 Idx) const
+float FXD_CustomSkeletalRuntimeData::GetCustomSkeletonValue(int32 Idx) const
 {
 	const FCustomSkeletonEntry& CustomSkeletonEntry = CustomConfig->SkeletonData[Idx];
 	return CustomSkeletonValues[Idx].GetValue(CustomSkeletonEntry.MinValue, CustomSkeletonEntry.MaxValue);
 }
 
-float FCustomCharacterRuntimeData::GetCustomSkeletonValueScaled(int32 Idx) const
+float FXD_CustomSkeletalRuntimeData::GetCustomSkeletonValueScaled(int32 Idx) const
 {
 	const FCustomSkeletonEntry& CustomSkeletonEntry = CustomConfig->SkeletonData[Idx];
 	return GetCustomSkeletonValue(Idx);
 }
 
-void FCustomCharacterRuntimeData::SetCustomSkeletonValue(int32 Idx, float InValue)
+void FXD_CustomSkeletalRuntimeData::SetCustomSkeletonValue(int32 Idx, float InValue)
 {
 	const FCustomSkeletonEntry& CustomSkeletonEntry = CustomConfig->SkeletonData[Idx];
 	CustomSkeletonValues[Idx].SetValue(InValue, CustomSkeletonEntry.MinValue, CustomSkeletonEntry.MaxValue);
 }
 
-float FCustomCharacterRuntimeData::GetCustomMorphValue(int32 Idx) const
+float FXD_CustomSkeletalRuntimeData::GetCustomMorphValue(int32 Idx) const
 {
 	const FCustomMorphEntry& CustomMorphEntry = CustomConfig->MorphData[Idx];
 	return CustomMorphValues[Idx].GetValue(CustomMorphEntry.MinValue, CustomMorphEntry.MaxValue);
 }
 
-void FCustomCharacterRuntimeData::SetCustomMorphValue(int32 Idx, float InValue, USkeletalMeshComponent* SkeletalMeshComponent)
+void FXD_CustomSkeletalRuntimeData::SetCustomMorphValue(int32 Idx, float InValue, USkeletalMeshComponent* SkeletalMeshComponent)
 {
 	const FCustomMorphEntry& CustomMorphEntry = CustomConfig->MorphData[Idx];
 	CustomMorphValues[Idx].SetValue(InValue, CustomMorphEntry.MinValue, CustomMorphEntry.MaxValue);
@@ -215,7 +225,7 @@ void FCustomCharacterRuntimeData::SetCustomMorphValue(int32 Idx, float InValue, 
 	}
 }
 
-void FCustomCharacterRuntimeData::ApplyMorphTarget(USkeletalMeshComponent* SkeletalMeshComponent) const
+void FXD_CustomSkeletalRuntimeData::ApplyMorphTarget(USkeletalMeshComponent* SkeletalMeshComponent) const
 {
 	for (int32 Idx = 0; Idx < CustomMorphValues.Num(); ++Idx)
 	{
@@ -228,7 +238,7 @@ void FCustomCharacterRuntimeData::ApplyMorphTarget(USkeletalMeshComponent* Skele
 	}
 }
 
-void FCustomCharacterRuntimeData::SetCustomMaterialFloatValue(int32 Idx, float InValue, USkeletalMeshComponent* SkeletalMeshComponent)
+void FXD_CustomSkeletalRuntimeData::SetCustomMaterialFloatValue(int32 Idx, float InValue, USkeletalMeshComponent* SkeletalMeshComponent)
 {
 	CustomMaterialFloatValues[Idx] = InValue;
 
@@ -291,7 +301,7 @@ void FCustomCharacterRuntimeData::SetCustomMaterialFloatValue(int32 Idx, float I
 	}
 }
 
-void FCustomCharacterRuntimeData::ApplyMaterialFloatValues(USkeletalMeshComponent* SkeletalMeshComponent) const
+void FXD_CustomSkeletalRuntimeData::ApplyMaterialFloatValues(USkeletalMeshComponent* SkeletalMeshComponent) const
 {
 	if (!CustomConfig)
 	{
@@ -357,7 +367,7 @@ void FCustomCharacterRuntimeData::ApplyMaterialFloatValues(USkeletalMeshComponen
 	}
 }
 
-void FCustomCharacterRuntimeData::SetCustomMaterialColorValue(int32 Idx, const FLinearColor& InValue, USkeletalMeshComponent* SkeletalMeshComponent)
+void FXD_CustomSkeletalRuntimeData::SetCustomMaterialColorValue(int32 Idx, const FLinearColor& InValue, USkeletalMeshComponent* SkeletalMeshComponent)
 {
 	CustomMaterialColorValues[Idx] = InValue;
 
@@ -374,7 +384,7 @@ void FCustomCharacterRuntimeData::SetCustomMaterialColorValue(int32 Idx, const F
 	}
 }
 
-void FCustomCharacterRuntimeData::ApplyMaterialColorValues(USkeletalMeshComponent* SkeletalMeshComponent) const
+void FXD_CustomSkeletalRuntimeData::ApplyMaterialColorValues(USkeletalMeshComponent* SkeletalMeshComponent) const
 {
 	if (!CustomConfig)
 	{
@@ -394,7 +404,7 @@ void FCustomCharacterRuntimeData::ApplyMaterialColorValues(USkeletalMeshComponen
 	}
 }
 
-void FCustomCharacterRuntimeData::SetCustomMaterialTextureValue(int32 Idx, UTexture* InValue, USkeletalMeshComponent* SkeletalMeshComponent)
+void FXD_CustomSkeletalRuntimeData::SetCustomMaterialTextureValue(int32 Idx, UTexture* InValue, USkeletalMeshComponent* SkeletalMeshComponent)
 {
 	CustomMaterialTextureValues[Idx] = InValue;
 
@@ -411,7 +421,7 @@ void FCustomCharacterRuntimeData::SetCustomMaterialTextureValue(int32 Idx, UText
 	}
 }
 
-void FCustomCharacterRuntimeData::ApplyMaterialTextureValues(USkeletalMeshComponent* SkeletalMeshComponent) const
+void FXD_CustomSkeletalRuntimeData::ApplyMaterialTextureValues(USkeletalMeshComponent* SkeletalMeshComponent) const
 {
 	if (!CustomConfig)
 	{
@@ -431,14 +441,14 @@ void FCustomCharacterRuntimeData::ApplyMaterialTextureValues(USkeletalMeshCompon
 	}
 }
 
-void FCustomCharacterRuntimeData::ApplyAllMaterialData(USkeletalMeshComponent* SkeletalMeshComponent) const
+void FXD_CustomSkeletalRuntimeData::ApplyAllMaterialData(USkeletalMeshComponent* SkeletalMeshComponent) const
 {
 	ApplyMaterialFloatValues(SkeletalMeshComponent);
 	ApplyMaterialColorValues(SkeletalMeshComponent);
 	ApplyMaterialTextureValues(SkeletalMeshComponent);
 }
 
-UMaterialInstanceDynamic* FCustomCharacterRuntimeData::GetMID(USkeletalMeshComponent* SkeletalMeshComponent, const FName& SlotName) const
+UMaterialInstanceDynamic* FXD_CustomSkeletalRuntimeData::GetMID(USkeletalMeshComponent* SkeletalMeshComponent, const FName& SlotName) const
 {
 	const int32 Idx = SkeletalMeshComponent->GetMaterialIndex(SlotName);
 	return SkeletalMeshComponent->CreateDynamicMaterialInstance(Idx, nullptr, *(TEXT("DMI_") + SlotName.ToString()));

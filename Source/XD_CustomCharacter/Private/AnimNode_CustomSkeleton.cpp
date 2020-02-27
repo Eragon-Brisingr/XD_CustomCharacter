@@ -5,7 +5,7 @@
 #include <AnimationRuntime.h>
 #include <Animation/AnimInstanceProxy.h>
 
-#include "CustomSkeletonConfig.h"
+#include "XD_CustomSkeletalConfig.h"
 
 void FAnimNode_CustomSkeleton::Initialize_AnyThread(const FAnimationInitializeContext& Context)
 {

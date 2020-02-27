@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 #include <Engine/DataAsset.h>
-#include "Kismet/BlueprintFunctionLibrary.h"
-#include "CustomSkeletonConfig.generated.h"
+#include <Kismet/BlueprintFunctionLibrary.h>
+#include "XD_CustomSkeletalConfig.generated.h"
 
 class USkeletalMeshComponent;
 class UMaterialInstanceDynamic;
@@ -225,7 +225,7 @@ public:
 };
 
 UCLASS(meta = (DisplayName = "角色定制配置"))
-class XD_CUSTOMCHARACTER_API UCustomCharacterConfig : public UObject
+class XD_CUSTOMCHARACTER_API UXD_CustomSkeletalConfig : public UObject
 {
 	GENERATED_BODY()
 public:
@@ -248,17 +248,18 @@ public:
 };
 
 USTRUCT(BlueprintType, BlueprintInternalUseOnly)
-struct XD_CUSTOMCHARACTER_API FCustomCharacterRuntimeData
+struct XD_CUSTOMCHARACTER_API FXD_CustomSkeletalRuntimeData
 {
 	GENERATED_BODY()
 public:
-	FCustomCharacterRuntimeData() = default;
+	FXD_CustomSkeletalRuntimeData() = default;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "角色定制")
-	UCustomCharacterConfig* CustomConfig;
+	UXD_CustomSkeletalConfig* CustomConfig;
 
-	void SetCustomCharacterRuntimeData(const FCustomCharacterRuntimeData& NewCustomCharacterRuntimeData);
-	void SyncConfigData(UCustomCharacterConfig* OldCustomConfig);
+	void SetCustomCharacterRuntimeData(const FXD_CustomSkeletalRuntimeData& NewCustomCharacterRuntimeData);
+	void SetCustomConfig(UXD_CustomSkeletalConfig* NewCustomConfig);
+	void SyncConfigData(UXD_CustomSkeletalConfig* OldCustomConfig);
 
 	UPROPERTY(EditAnywhere, Category = "角色定制", EditFixedSize, SaveGame)
 	TArray<FCustomCharacterRuntimeNumber> CustomSkeletonValues;
@@ -309,23 +310,23 @@ private:
 };
 
 USTRUCT(BlueprintType, meta = (HasNativeMake = "CustomCharacterFunctionLibrary.MakeCustomCharacterRuntimeDataRef"))
-struct XD_CUSTOMCHARACTER_API FCustomCharacterRuntimeDataRef
+struct XD_CUSTOMCHARACTER_API FXD_CustomSkeletalRuntimeDataRef
 {
 	GENERATED_BODY()
 public:
-	FCustomCharacterRuntimeDataRef()
+	FXD_CustomSkeletalRuntimeDataRef()
 		:CustomCharacterRuntimeDataPtr(nullptr)
 	{}
 
-	FCustomCharacterRuntimeDataRef(FCustomCharacterRuntimeData& Data)
+	FXD_CustomSkeletalRuntimeDataRef(FXD_CustomSkeletalRuntimeData& Data)
 		:CustomCharacterRuntimeDataPtr(&Data)
 	{}
 
-	FCustomCharacterRuntimeData* operator->() { return CustomCharacterRuntimeDataPtr; }
-	const FCustomCharacterRuntimeData* operator->() const { return CustomCharacterRuntimeDataPtr; }
+	FXD_CustomSkeletalRuntimeData* operator->() { return CustomCharacterRuntimeDataPtr; }
+	const FXD_CustomSkeletalRuntimeData* operator->() const { return CustomCharacterRuntimeDataPtr; }
 	constexpr explicit operator bool() const noexcept { return CustomCharacterRuntimeDataPtr ? CustomCharacterRuntimeDataPtr->CustomConfig ? true : false : false; }
 
-	FCustomCharacterRuntimeData* CustomCharacterRuntimeDataPtr;
+	FXD_CustomSkeletalRuntimeData* CustomCharacterRuntimeDataPtr;
 };
 
 UCLASS()
@@ -334,53 +335,53 @@ class XD_CUSTOMCHARACTER_API UCustomCharacterFunctionLibrary : public UBlueprint
 	GENERATED_BODY()
 public:
 	UFUNCTION(BlueprintPure, Category = "角色|定制")
-	static UCustomCharacterConfig* GetCustomConfig(const FCustomCharacterRuntimeDataRef& Data) { return Data ? Data->CustomConfig : nullptr; }
+	static UXD_CustomSkeletalConfig* GetCustomConfig(const FXD_CustomSkeletalRuntimeDataRef& Data) { return Data ? Data->CustomConfig : nullptr; }
 
 	UFUNCTION(BlueprintPure, Category = "角色|定制")
-	static float GetCustomSkeletonValue(const FCustomCharacterRuntimeDataRef& Data, int32 Idx) { return Data ? Data->GetCustomSkeletonValue(Idx) : 0.f; }
+	static float GetCustomSkeletonValue(const FXD_CustomSkeletalRuntimeDataRef& Data, int32 Idx) { return Data ? Data->GetCustomSkeletonValue(Idx) : 0.f; }
 
 	UFUNCTION(BlueprintCallable, Category = "角色|定制")
-	static void SetCustomSkeletonValue(UPARAM(Ref)FCustomCharacterRuntimeDataRef& Data, int32 Idx, float InValue) { if (Data) Data->SetCustomSkeletonValue(Idx, InValue); }
+	static void SetCustomSkeletonValue(UPARAM(Ref)FXD_CustomSkeletalRuntimeDataRef& Data, int32 Idx, float InValue) { if (Data) Data->SetCustomSkeletonValue(Idx, InValue); }
 
 	UFUNCTION(BlueprintPure, Category = "角色|定制")
-	static FCustomSkeletonEntry GetCustomSkeletonConfig(const FCustomCharacterRuntimeDataRef& Data, int32 Idx) { return Data ? Data->CustomConfig->SkeletonData[Idx] : FCustomSkeletonEntry(); }
+	static FCustomSkeletonEntry GetCustomSkeletonConfig(const FXD_CustomSkeletalRuntimeDataRef& Data, int32 Idx) { return Data ? Data->CustomConfig->SkeletonData[Idx] : FCustomSkeletonEntry(); }
 
 	UFUNCTION(BlueprintPure, Category = "角色|定制")
-	static float GetCustomMorphValue(const FCustomCharacterRuntimeDataRef& Data, int32 Idx) { return Data ? Data->GetCustomMorphValue(Idx) : 0.f; }
+	static float GetCustomMorphValue(const FXD_CustomSkeletalRuntimeDataRef& Data, int32 Idx) { return Data ? Data->GetCustomMorphValue(Idx) : 0.f; }
 
 	UFUNCTION(BlueprintCallable, Category = "角色|定制")
-	static void SetCustomMorphValue(UPARAM(Ref)FCustomCharacterRuntimeDataRef& Data, int32 Idx, float InValue, USkeletalMeshComponent* SkeletalMeshComponent) { if (Data) Data->SetCustomMorphValue(Idx, InValue, SkeletalMeshComponent); }
+	static void SetCustomMorphValue(UPARAM(Ref)FXD_CustomSkeletalRuntimeDataRef& Data, int32 Idx, float InValue, USkeletalMeshComponent* SkeletalMeshComponent) { if (Data) Data->SetCustomMorphValue(Idx, InValue, SkeletalMeshComponent); }
 
 	UFUNCTION(BlueprintPure, Category = "角色|定制")
-	static FCustomMorphEntry GetCustomMorphConfig(const FCustomCharacterRuntimeDataRef& Data, int32 Idx) { return Data ? Data->CustomConfig->MorphData[Idx] : FCustomMorphEntry(); }
+	static FCustomMorphEntry GetCustomMorphConfig(const FXD_CustomSkeletalRuntimeDataRef& Data, int32 Idx) { return Data ? Data->CustomConfig->MorphData[Idx] : FCustomMorphEntry(); }
 
 	UFUNCTION(BlueprintPure, Category = "角色|定制")
-	static float GetCustomMaterialFloatValue(const FCustomCharacterRuntimeDataRef& Data, int32 Idx) { return Data ? Data->GetCustomMaterialFloatValue(Idx) : 0.f; }
+	static float GetCustomMaterialFloatValue(const FXD_CustomSkeletalRuntimeDataRef& Data, int32 Idx) { return Data ? Data->GetCustomMaterialFloatValue(Idx) : 0.f; }
 
 	UFUNCTION(BlueprintCallable, Category = "角色|定制")
-	static void SetCustomMaterialFloatValue(UPARAM(Ref)FCustomCharacterRuntimeDataRef& Data, int32 Idx, float InValue, USkeletalMeshComponent* SkeletalMeshComponent) { if (Data) Data->SetCustomMaterialFloatValue(Idx, InValue, SkeletalMeshComponent); }
+	static void SetCustomMaterialFloatValue(UPARAM(Ref)FXD_CustomSkeletalRuntimeDataRef& Data, int32 Idx, float InValue, USkeletalMeshComponent* SkeletalMeshComponent) { if (Data) Data->SetCustomMaterialFloatValue(Idx, InValue, SkeletalMeshComponent); }
 
 	UFUNCTION(BlueprintPure, Category = "角色|定制")
-	static FCustomMaterialFloatEntry GetCustomMaterialFloatConfig(const FCustomCharacterRuntimeDataRef& Data, int32 Idx) { return Data ? Data->CustomConfig->MaterialFloatData[Idx] : FCustomMaterialFloatEntry(); }
+	static FCustomMaterialFloatEntry GetCustomMaterialFloatConfig(const FXD_CustomSkeletalRuntimeDataRef& Data, int32 Idx) { return Data ? Data->CustomConfig->MaterialFloatData[Idx] : FCustomMaterialFloatEntry(); }
 
 	UFUNCTION(BlueprintPure, Category = "角色|定制")
-	static FLinearColor GetCustomMaterialColorValue(const FCustomCharacterRuntimeDataRef& Data, int32 Idx) { return Data ? Data->GetCustomMaterialColorValue(Idx) : FLinearColor::White; }
+	static FLinearColor GetCustomMaterialColorValue(const FXD_CustomSkeletalRuntimeDataRef& Data, int32 Idx) { return Data ? Data->GetCustomMaterialColorValue(Idx) : FLinearColor::White; }
 
 	UFUNCTION(BlueprintCallable, Category = "角色|定制")
-	static void SetCustomMaterialColorValue(UPARAM(Ref)FCustomCharacterRuntimeDataRef& Data, int32 Idx, const FLinearColor& InValue, USkeletalMeshComponent* SkeletalMeshComponent) { if (Data) Data->SetCustomMaterialColorValue(Idx, InValue, SkeletalMeshComponent); }
+	static void SetCustomMaterialColorValue(UPARAM(Ref)FXD_CustomSkeletalRuntimeDataRef& Data, int32 Idx, const FLinearColor& InValue, USkeletalMeshComponent* SkeletalMeshComponent) { if (Data) Data->SetCustomMaterialColorValue(Idx, InValue, SkeletalMeshComponent); }
 
 	UFUNCTION(BlueprintPure, Category = "角色|定制")
-	static FCustomMaterialColorEntry GetCustomMaterialColorConfig(const FCustomCharacterRuntimeDataRef& Data, int32 Idx) { return Data ? Data->CustomConfig->MaterialColorData[Idx] : FCustomMaterialColorEntry(); }
+	static FCustomMaterialColorEntry GetCustomMaterialColorConfig(const FXD_CustomSkeletalRuntimeDataRef& Data, int32 Idx) { return Data ? Data->CustomConfig->MaterialColorData[Idx] : FCustomMaterialColorEntry(); }
 
 	UFUNCTION(BlueprintPure, Category = "角色|定制")
-	static UTexture* GetCustomMaterialTextureValue(const FCustomCharacterRuntimeDataRef& Data, int32 Idx) { return Data ? Data->GetCustomMaterialTextureValue(Idx) : nullptr; }
+	static UTexture* GetCustomMaterialTextureValue(const FXD_CustomSkeletalRuntimeDataRef& Data, int32 Idx) { return Data ? Data->GetCustomMaterialTextureValue(Idx) : nullptr; }
 
 	UFUNCTION(BlueprintCallable, Category = "角色|定制")
-	static void SetCustomMaterialTextureValue(UPARAM(Ref)FCustomCharacterRuntimeDataRef& Data, int32 Idx, UTexture* InValue, USkeletalMeshComponent* SkeletalMeshComponent) { if (Data) Data->SetCustomMaterialTextureValue(Idx, InValue, SkeletalMeshComponent); }
+	static void SetCustomMaterialTextureValue(UPARAM(Ref)FXD_CustomSkeletalRuntimeDataRef& Data, int32 Idx, UTexture* InValue, USkeletalMeshComponent* SkeletalMeshComponent) { if (Data) Data->SetCustomMaterialTextureValue(Idx, InValue, SkeletalMeshComponent); }
 
 	UFUNCTION(BlueprintPure, Category = "角色|定制")
-	static FCustomMaterialTextureEntry GetCustomMaterialTextureConfig(const FCustomCharacterRuntimeDataRef& Data, int32 Idx) { return Data ? Data->CustomConfig->MaterialTextureData[Idx] : FCustomMaterialTextureEntry(); }
+	static FCustomMaterialTextureEntry GetCustomMaterialTextureConfig(const FXD_CustomSkeletalRuntimeDataRef& Data, int32 Idx) { return Data ? Data->CustomConfig->MaterialTextureData[Idx] : FCustomMaterialTextureEntry(); }
 
 	UFUNCTION(BlueprintPure, Category = "角色|定制", meta = (NativeMakeFunc, CompactNodeTitle = "ToRef", BlueprintAutocast, BlueprintThreadSafe))
-	static FCustomCharacterRuntimeDataRef MakeCustomCharacterRuntimeDataRef(UPARAM(Ref) FCustomCharacterRuntimeData& Data) { return FCustomCharacterRuntimeDataRef(Data); }
+	static FXD_CustomSkeletalRuntimeDataRef MakeCustomCharacterRuntimeDataRef(const FXD_CustomSkeletalRuntimeData& Data) { return FXD_CustomSkeletalRuntimeDataRef(const_cast<FXD_CustomSkeletalRuntimeData&>(Data)); }
 };

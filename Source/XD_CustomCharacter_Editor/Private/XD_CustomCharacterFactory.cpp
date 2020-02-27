@@ -4,22 +4,22 @@
 #include "XD_CustomCharacterFactory.h"
 #include <AssetTypeCategories.h>
 
-#include "CustomSkeletonConfig.h"
+#include "XD_CustomSkeletalConfig.h"
 #include "XD_CustomCharacter_Editor.h"
 
 #define LOCTEXT_NAMESPACE "XD_CustomCharacterFactory"
 
 UXD_CustomCharacterConfigFactory::UXD_CustomCharacterConfigFactory()
 {
-	SupportedClass = UCustomCharacterConfig::StaticClass();
+	SupportedClass = UXD_CustomSkeletalConfig::StaticClass();
 	bCreateNew = true;
 	bEditAfterNew = true;
 }
 
 UObject* UXD_CustomCharacterConfigFactory::FactoryCreateNew(UClass* Class, UObject* InParent, FName Name, EObjectFlags Flags, UObject* Context, FFeedbackContext* Warn, FName CallingContext)
 {
-	check(Class->IsChildOf(UCustomCharacterConfig::StaticClass()));
-	return NewObject<UCustomCharacterConfig>(InParent, Class, Name, Flags);
+	check(Class->IsChildOf(UXD_CustomSkeletalConfig::StaticClass()));
+	return NewObject<UXD_CustomSkeletalConfig>(InParent, Class, Name, Flags);
 }
 
 FText UXD_CustomCharacterConfigFactory::GetDisplayName() const
@@ -34,7 +34,7 @@ FText FAssetTypeActions_CustomCharacterConfig::GetName() const
 
 UClass* FAssetTypeActions_CustomCharacterConfig::GetSupportedClass() const
 {
-	return UCustomCharacterConfig::StaticClass();
+	return UXD_CustomSkeletalConfig::StaticClass();
 }
 
 FColor FAssetTypeActions_CustomCharacterConfig::GetTypeColor() const

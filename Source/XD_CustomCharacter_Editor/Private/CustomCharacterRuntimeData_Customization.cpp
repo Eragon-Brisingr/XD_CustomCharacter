@@ -10,17 +10,21 @@
 #include <Widgets/Input/SButton.h>
 #include <Engine/Texture.h>
 #include <PropertyCustomizationHelpers.h>
+#include <IPropertyTypeCustomization.h>
+#include <IPropertyUtilities.h>
 
 #include "XD_PropertyCustomizationEx.h"
-#include "CustomSkeletonConfig.h"
+#include "XD_CustomSkeletalConfig.h"
 
 #define LOCTEXT_NAMESPACE "CustomCharacterRuntimeData_Customization"
 
-void FCustomCharacterRuntimeData_Customization::CustomizeHeader(TSharedRef<class IPropertyHandle> StructPropertyHandle, class FDetailWidgetRow& HeaderRow, IPropertyTypeCustomizationUtils& StructCustomizationUtils)
+void FCustomCharacterRuntimeData_Customization::CustomizeHeader(TSharedRef<class IPropertyHandle> StructPropertyHandle, class FDetailWidgetRow& HeaderRow, IPropertyTypeCustomizationUtils& CustomizationUtils)
 {
-	TSharedPtr<IPropertyHandle> CustomConfig_PropertyHandle = StructPropertyHandle->GetChildHandle(GET_MEMBER_NAME_CHECKED(FCustomCharacterRuntimeData, CustomConfig));
+	TSharedPtr<IPropertyUtilities> PropertyUtils = CustomizationUtils.GetPropertyUtilities();
 
-	FCustomCharacterRuntimeData CustomCharacterRuntimeData = FPropertyCustomizeHelper::GetValue<FCustomCharacterRuntimeData>(StructPropertyHandle);
+	TSharedPtr<IPropertyHandle> CustomConfig_PropertyHandle = StructPropertyHandle->GetChildHandle(GET_MEMBER_NAME_CHECKED(FXD_CustomSkeletalRuntimeData, CustomConfig));
+
+	FXD_CustomSkeletalRuntimeData CustomCharacterRuntimeData = FPropertyCustomizeHelper::GetValue<FXD_CustomSkeletalRuntimeData>(StructPropertyHandle);
 	CustomCharacterRuntimeData.SyncConfigData(CustomCharacterRuntimeData.CustomConfig);
 	Config = CustomCharacterRuntimeData.CustomConfig;
 	FPropertyCustomizeHelper::SetValue(StructPropertyHandle, CustomCharacterRuntimeData, false);
@@ -29,10 +33,12 @@ void FCustomCharacterRuntimeData_Customization::CustomizeHeader(TSharedRef<class
 	{
 		CustomConfig_PropertyHandle->SetOnPropertyValueChanged(FSimpleDelegate::CreateLambda([=]()
 			{
-				FCustomCharacterRuntimeData CustomCharacterRuntimeData = FPropertyCustomizeHelper::GetValue<FCustomCharacterRuntimeData>(StructPropertyHandle);
+				FXD_CustomSkeletalRuntimeData CustomCharacterRuntimeData = FPropertyCustomizeHelper::GetValue<FXD_CustomSkeletalRuntimeData>(StructPropertyHandle);
 				CustomCharacterRuntimeData.SyncConfigData(Config.Get());
 				Config = CustomCharacterRuntimeData.CustomConfig;
 				FPropertyCustomizeHelper::SetValue(StructPropertyHandle, CustomCharacterRuntimeData);
+
+				PropertyUtils->ForceRefresh();
 			}));
 
 		HeaderRow.NameContent()
@@ -100,7 +106,7 @@ void FCustomCharacterRuntimeData_Customization::CustomizeChildren(TSharedRef<cla
 {
 	//TODO 提供返回至默认值的按钮 SResetToDefaultPropertyEditor
 
-	FCustomCharacterRuntimeData CustomCharacterRuntimeData = FPropertyCustomizeHelper::GetValue<FCustomCharacterRuntimeData>(StructPropertyHandle);
+	FXD_CustomSkeletalRuntimeData CustomCharacterRuntimeData = FPropertyCustomizeHelper::GetValue<FXD_CustomSkeletalRuntimeData>(StructPropertyHandle);
 	if (CustomCharacterRuntimeData.CustomConfig)
 	{
 		TMap<FName, IDetailGroup*> GroupMap;
@@ -137,7 +143,7 @@ void FCustomCharacterRuntimeData_Customization::CustomizeChildren(TSharedRef<cla
 						.AllowSpin(true)
 						.Value_Lambda([=]()
 							{
-								FCustomCharacterRuntimeData CustomCharacterRuntimeData = FPropertyCustomizeHelper::GetValue<FCustomCharacterRuntimeData>(StructPropertyHandle);
+								FXD_CustomSkeletalRuntimeData CustomCharacterRuntimeData = FPropertyCustomizeHelper::GetValue<FXD_CustomSkeletalRuntimeData>(StructPropertyHandle);
 								if (Idx < CustomCharacterRuntimeData.CustomSkeletonValues.Num())
 								{
 									return CustomCharacterRuntimeData.GetCustomSkeletonValue(Idx);
@@ -149,7 +155,7 @@ void FCustomCharacterRuntimeData_Customization::CustomizeChildren(TSharedRef<cla
 							})
 						.OnValueChanged_Lambda([=](float NewValue)
 							{
-								if (FCustomCharacterRuntimeData* Value = FPropertyCustomizeHelper::Value<FCustomCharacterRuntimeData>(StructPropertyHandle))
+								if (FXD_CustomSkeletalRuntimeData* Value = FPropertyCustomizeHelper::Value<FXD_CustomSkeletalRuntimeData>(StructPropertyHandle))
 								{
 									if (Idx < Value->CustomSkeletonValues.Num())
 									{
@@ -159,7 +165,7 @@ void FCustomCharacterRuntimeData_Customization::CustomizeChildren(TSharedRef<cla
 							})
 						.OnValueCommitted_Lambda([=](float NewValue, ETextCommit::Type CommitType)
 							{
-								FCustomCharacterRuntimeData CustomCharacterRuntimeData = FPropertyCustomizeHelper::GetValue<FCustomCharacterRuntimeData>(StructPropertyHandle);
+								FXD_CustomSkeletalRuntimeData CustomCharacterRuntimeData = FPropertyCustomizeHelper::GetValue<FXD_CustomSkeletalRuntimeData>(StructPropertyHandle);
 								CustomCharacterRuntimeData.SetCustomSkeletonValue(Idx, NewValue);
 								FPropertyCustomizeHelper::SetValue(StructPropertyHandle, CustomCharacterRuntimeData);
 							})
@@ -173,7 +179,7 @@ void FCustomCharacterRuntimeData_Customization::CustomizeChildren(TSharedRef<cla
 						SNew(FCustomCharacterWidget::SResetToDefaultButton)
 						.OnClicked_Lambda([=]()
 							{
-								FCustomCharacterRuntimeData CustomCharacterRuntimeData = FPropertyCustomizeHelper::GetValue<FCustomCharacterRuntimeData>(StructPropertyHandle);
+								FXD_CustomSkeletalRuntimeData CustomCharacterRuntimeData = FPropertyCustomizeHelper::GetValue<FXD_CustomSkeletalRuntimeData>(StructPropertyHandle);
 								if (CustomCharacterRuntimeData.CustomConfig && Idx < CustomCharacterRuntimeData.CustomSkeletonValues.Num())
 								{
 									CustomCharacterRuntimeData.SetCustomSkeletonValue(Idx, CustomCharacterRuntimeData.CustomConfig->SkeletonData[Idx].DefaultValue);
@@ -183,7 +189,7 @@ void FCustomCharacterRuntimeData_Customization::CustomizeChildren(TSharedRef<cla
 							})
 						.Visibility_Lambda([=]()
 							{
-								FCustomCharacterRuntimeData CustomCharacterRuntimeData = FPropertyCustomizeHelper::GetValue<FCustomCharacterRuntimeData>(StructPropertyHandle);
+								FXD_CustomSkeletalRuntimeData CustomCharacterRuntimeData = FPropertyCustomizeHelper::GetValue<FXD_CustomSkeletalRuntimeData>(StructPropertyHandle);
 								if (CustomCharacterRuntimeData.CustomConfig && Idx < CustomCharacterRuntimeData.CustomSkeletonValues.Num())
 								{
 									return CustomCharacterRuntimeData.GetCustomSkeletonValue(Idx) != CustomCharacterRuntimeData.CustomConfig->SkeletonData[Idx].DefaultValue ? EVisibility::Visible : EVisibility::Hidden;
@@ -220,7 +226,7 @@ void FCustomCharacterRuntimeData_Customization::CustomizeChildren(TSharedRef<cla
 						.AllowSpin(true)
 						.Value_Lambda([=]()
 							{
-								FCustomCharacterRuntimeData CustomCharacterRuntimeData = FPropertyCustomizeHelper::GetValue<FCustomCharacterRuntimeData>(StructPropertyHandle);
+								FXD_CustomSkeletalRuntimeData CustomCharacterRuntimeData = FPropertyCustomizeHelper::GetValue<FXD_CustomSkeletalRuntimeData>(StructPropertyHandle);
 								if (Idx < CustomCharacterRuntimeData.CustomMorphValues.Num())
 								{
 									return CustomCharacterRuntimeData.GetCustomMorphValue(Idx);
@@ -232,7 +238,7 @@ void FCustomCharacterRuntimeData_Customization::CustomizeChildren(TSharedRef<cla
 							})
 						.OnValueChanged_Lambda([=](float NewValue)
 							{
-								if (FCustomCharacterRuntimeData* Value = FPropertyCustomizeHelper::Value<FCustomCharacterRuntimeData>(StructPropertyHandle))
+								if (FXD_CustomSkeletalRuntimeData* Value = FPropertyCustomizeHelper::Value<FXD_CustomSkeletalRuntimeData>(StructPropertyHandle))
 								{
 									if (Idx < Value->CustomMorphValues.Num())
 									{
@@ -242,7 +248,7 @@ void FCustomCharacterRuntimeData_Customization::CustomizeChildren(TSharedRef<cla
 							})
 						.OnValueCommitted_Lambda([=](float NewValue, ETextCommit::Type CommitType)
 							{
-								FCustomCharacterRuntimeData CustomCharacterRuntimeData = FPropertyCustomizeHelper::GetValue<FCustomCharacterRuntimeData>(StructPropertyHandle);
+								FXD_CustomSkeletalRuntimeData CustomCharacterRuntimeData = FPropertyCustomizeHelper::GetValue<FXD_CustomSkeletalRuntimeData>(StructPropertyHandle);
 								CustomCharacterRuntimeData.SetCustomMorphValue(Idx, NewValue, nullptr);
 								FPropertyCustomizeHelper::SetValue(StructPropertyHandle, CustomCharacterRuntimeData);
 							})
@@ -256,7 +262,7 @@ void FCustomCharacterRuntimeData_Customization::CustomizeChildren(TSharedRef<cla
 						SNew(FCustomCharacterWidget::SResetToDefaultButton)
 						.OnClicked_Lambda([=]()
 							{
-								FCustomCharacterRuntimeData CustomCharacterRuntimeData = FPropertyCustomizeHelper::GetValue<FCustomCharacterRuntimeData>(StructPropertyHandle);
+								FXD_CustomSkeletalRuntimeData CustomCharacterRuntimeData = FPropertyCustomizeHelper::GetValue<FXD_CustomSkeletalRuntimeData>(StructPropertyHandle);
 								if (CustomCharacterRuntimeData.CustomConfig && Idx < CustomCharacterRuntimeData.CustomMorphValues.Num())
 								{
 									CustomCharacterRuntimeData.SetCustomMorphValue(Idx, CustomCharacterRuntimeData.CustomConfig->MorphData[Idx].DefaultValue, nullptr);
@@ -266,7 +272,7 @@ void FCustomCharacterRuntimeData_Customization::CustomizeChildren(TSharedRef<cla
 							})
 						.Visibility_Lambda([=]()
 							{
-								FCustomCharacterRuntimeData CustomCharacterRuntimeData = FPropertyCustomizeHelper::GetValue<FCustomCharacterRuntimeData>(StructPropertyHandle);
+								FXD_CustomSkeletalRuntimeData CustomCharacterRuntimeData = FPropertyCustomizeHelper::GetValue<FXD_CustomSkeletalRuntimeData>(StructPropertyHandle);
 								if (CustomCharacterRuntimeData.CustomConfig && Idx < CustomCharacterRuntimeData.CustomMorphValues.Num())
 								{
 									return CustomCharacterRuntimeData.GetCustomMorphValue(Idx) != CustomCharacterRuntimeData.CustomConfig->MorphData[Idx].DefaultValue ? EVisibility::Visible : EVisibility::Hidden;
@@ -302,7 +308,7 @@ void FCustomCharacterRuntimeData_Customization::CustomizeChildren(TSharedRef<cla
 						.AllowSpin(true)
 						.Value_Lambda([=]()
 							{
-								FCustomCharacterRuntimeData CustomCharacterRuntimeData = FPropertyCustomizeHelper::GetValue<FCustomCharacterRuntimeData>(StructPropertyHandle);
+								FXD_CustomSkeletalRuntimeData CustomCharacterRuntimeData = FPropertyCustomizeHelper::GetValue<FXD_CustomSkeletalRuntimeData>(StructPropertyHandle);
 								if (Idx < CustomCharacterRuntimeData.CustomMaterialFloatValues.Num())
 								{
 									return CustomCharacterRuntimeData.CustomMaterialFloatValues[Idx];
@@ -314,7 +320,7 @@ void FCustomCharacterRuntimeData_Customization::CustomizeChildren(TSharedRef<cla
 							})
 						.OnValueChanged_Lambda([=](float NewValue)
 							{
-								if (FCustomCharacterRuntimeData* Value = FPropertyCustomizeHelper::Value<FCustomCharacterRuntimeData>(StructPropertyHandle))
+								if (FXD_CustomSkeletalRuntimeData* Value = FPropertyCustomizeHelper::Value<FXD_CustomSkeletalRuntimeData>(StructPropertyHandle))
 								{
 									if (Idx < Value->CustomMaterialFloatValues.Num())
 									{
@@ -324,7 +330,7 @@ void FCustomCharacterRuntimeData_Customization::CustomizeChildren(TSharedRef<cla
 							})
 						.OnValueCommitted_Lambda([=](float NewValue, ETextCommit::Type CommitType)
 							{
-								FCustomCharacterRuntimeData CustomCharacterRuntimeData = FPropertyCustomizeHelper::GetValue<FCustomCharacterRuntimeData>(StructPropertyHandle);
+								FXD_CustomSkeletalRuntimeData CustomCharacterRuntimeData = FPropertyCustomizeHelper::GetValue<FXD_CustomSkeletalRuntimeData>(StructPropertyHandle);
 								CustomCharacterRuntimeData.CustomMaterialFloatValues[Idx] = NewValue;
 								FPropertyCustomizeHelper::SetValue(StructPropertyHandle, CustomCharacterRuntimeData);
 							})
@@ -338,7 +344,7 @@ void FCustomCharacterRuntimeData_Customization::CustomizeChildren(TSharedRef<cla
 						SNew(FCustomCharacterWidget::SResetToDefaultButton)
 						.OnClicked_Lambda([=]()
 							{
-								FCustomCharacterRuntimeData CustomCharacterRuntimeData = FPropertyCustomizeHelper::GetValue<FCustomCharacterRuntimeData>(StructPropertyHandle);
+								FXD_CustomSkeletalRuntimeData CustomCharacterRuntimeData = FPropertyCustomizeHelper::GetValue<FXD_CustomSkeletalRuntimeData>(StructPropertyHandle);
 								if (CustomCharacterRuntimeData.CustomConfig && Idx < CustomCharacterRuntimeData.CustomMaterialFloatValues.Num())
 								{
 									CustomCharacterRuntimeData.CustomMaterialFloatValues[Idx] = CustomCharacterRuntimeData.CustomConfig->MaterialFloatData[Idx].DefaultValue;
@@ -348,7 +354,7 @@ void FCustomCharacterRuntimeData_Customization::CustomizeChildren(TSharedRef<cla
 							})
 						.Visibility_Lambda([=]()
 							{
-								FCustomCharacterRuntimeData CustomCharacterRuntimeData = FPropertyCustomizeHelper::GetValue<FCustomCharacterRuntimeData>(StructPropertyHandle);
+								FXD_CustomSkeletalRuntimeData CustomCharacterRuntimeData = FPropertyCustomizeHelper::GetValue<FXD_CustomSkeletalRuntimeData>(StructPropertyHandle);
 								if (CustomCharacterRuntimeData.CustomConfig && Idx < CustomCharacterRuntimeData.CustomMaterialFloatValues.Num())
 								{
 									return CustomCharacterRuntimeData.CustomMaterialFloatValues[Idx] != CustomCharacterRuntimeData.CustomConfig->MaterialFloatData[Idx].DefaultValue ? EVisibility::Visible : EVisibility::Hidden;
@@ -366,7 +372,7 @@ void FCustomCharacterRuntimeData_Customization::CustomizeChildren(TSharedRef<cla
  		for (int32 Idx = 0; Idx < MaterialColorData.Num(); ++Idx)
  		{
  			const FCustomMaterialColorEntry& Entry = MaterialColorData[Idx];
-			TSharedRef<IPropertyHandleArray> CustomMaterialColorValues_Handle = StructPropertyHandle->GetChildHandle(GET_MEMBER_NAME_CHECKED(FCustomCharacterRuntimeData, CustomMaterialColorValues))->AsArray().ToSharedRef();
+			TSharedRef<IPropertyHandleArray> CustomMaterialColorValues_Handle = StructPropertyHandle->GetChildHandle(GET_MEMBER_NAME_CHECKED(FXD_CustomSkeletalRuntimeData, CustomMaterialColorValues))->AsArray().ToSharedRef();
 			uint32 NumElements;
 			CustomMaterialColorValues_Handle->GetNumElements(NumElements);
 			if (int32(NumElements) > Idx)
@@ -376,7 +382,7 @@ void FCustomCharacterRuntimeData_Customization::CustomizeChildren(TSharedRef<cla
 				DetailPropertyRow.DisplayName(Entry.DisplayName);
 				DetailPropertyRow.OverrideResetToDefault(FResetToDefaultOverride::Create(FIsResetToDefaultVisible::CreateLambda([=](TSharedPtr<IPropertyHandle> PropertyHandle)
 					{
-						FCustomCharacterRuntimeData CustomCharacterRuntimeData = FPropertyCustomizeHelper::GetValue<FCustomCharacterRuntimeData>(StructPropertyHandle);
+						FXD_CustomSkeletalRuntimeData CustomCharacterRuntimeData = FPropertyCustomizeHelper::GetValue<FXD_CustomSkeletalRuntimeData>(StructPropertyHandle);
 						if (CustomCharacterRuntimeData.CustomConfig && Idx < CustomCharacterRuntimeData.CustomMaterialColorValues.Num())
 						{
 							return CustomCharacterRuntimeData.CustomMaterialColorValues[Idx] != CustomCharacterRuntimeData.CustomConfig->MaterialColorData[Idx].DefaultColor;
@@ -388,7 +394,7 @@ void FCustomCharacterRuntimeData_Customization::CustomizeChildren(TSharedRef<cla
 					}),
 					FResetToDefaultHandler::CreateLambda([=](TSharedPtr<IPropertyHandle> PropertyHandle)
 					{
-						FCustomCharacterRuntimeData CustomCharacterRuntimeData = FPropertyCustomizeHelper::GetValue<FCustomCharacterRuntimeData>(StructPropertyHandle);
+						FXD_CustomSkeletalRuntimeData CustomCharacterRuntimeData = FPropertyCustomizeHelper::GetValue<FXD_CustomSkeletalRuntimeData>(StructPropertyHandle);
 						if (CustomCharacterRuntimeData.CustomConfig && Idx < CustomCharacterRuntimeData.CustomMaterialColorValues.Num())
 						{
 							CustomCharacterRuntimeData.CustomMaterialColorValues[Idx] = CustomCharacterRuntimeData.CustomConfig->MaterialColorData[Idx].DefaultColor;
@@ -411,7 +417,7 @@ void FCustomCharacterRuntimeData_Customization::CustomizeChildren(TSharedRef<cla
  		{
 			//TODO 从预制的地方选择
  			const FCustomMaterialTextureEntry& Entry = MaterialTextureData[Idx];
-			TSharedRef<IPropertyHandleArray> CustomMaterialTextureValues_Handle = StructPropertyHandle->GetChildHandle(GET_MEMBER_NAME_CHECKED(FCustomCharacterRuntimeData, CustomMaterialTextureValues))->AsArray().ToSharedRef();
+			TSharedRef<IPropertyHandleArray> CustomMaterialTextureValues_Handle = StructPropertyHandle->GetChildHandle(GET_MEMBER_NAME_CHECKED(FXD_CustomSkeletalRuntimeData, CustomMaterialTextureValues))->AsArray().ToSharedRef();
 			uint32 NumElements;
 			CustomMaterialTextureValues_Handle->GetNumElements(NumElements);
 			if (int32(NumElements) > Idx)
@@ -442,14 +448,14 @@ void FCustomCharacterRuntimeData_Customization::CustomizeChildren(TSharedRef<cla
 							.PropertyHandle(Element)
 							.OnShouldFilterAsset_Lambda([=](const FAssetData& AssetData)
 								{
-									FCustomCharacterRuntimeData CustomCharacterRuntimeData = FPropertyCustomizeHelper::GetValue<FCustomCharacterRuntimeData>(StructPropertyHandle);
+									FXD_CustomSkeletalRuntimeData CustomCharacterRuntimeData = FPropertyCustomizeHelper::GetValue<FXD_CustomSkeletalRuntimeData>(StructPropertyHandle);
 									UCustomMaterialTextureConfig* TextureConfig = CustomCharacterRuntimeData.CustomConfig ? CustomCharacterRuntimeData.CustomConfig->MaterialTextureData[Idx].TextureConfig : nullptr;
 									bool NeedShow = TextureConfig && TextureConfig->ReplaceTextures.ContainsByPredicate([&](UTexture* Texture) { return Texture ? Texture->GetFName() == AssetData.AssetName : false; });
 									return !NeedShow;
 								})
 							.CustomResetToDefault(FResetToDefaultOverride::Create(FIsResetToDefaultVisible::CreateLambda([=](TSharedPtr<IPropertyHandle> PropertyHandle)
 							{
-								FCustomCharacterRuntimeData CustomCharacterRuntimeData = FPropertyCustomizeHelper::GetValue<FCustomCharacterRuntimeData>(StructPropertyHandle);
+								FXD_CustomSkeletalRuntimeData CustomCharacterRuntimeData = FPropertyCustomizeHelper::GetValue<FXD_CustomSkeletalRuntimeData>(StructPropertyHandle);
 								if (CustomCharacterRuntimeData.CustomConfig && Idx < CustomCharacterRuntimeData.CustomMaterialTextureValues.Num())
 								{
 									return CustomCharacterRuntimeData.CustomMaterialTextureValues[Idx] != CustomCharacterRuntimeData.CustomConfig->MaterialTextureData[Idx].DefaultTexture;
@@ -461,7 +467,7 @@ void FCustomCharacterRuntimeData_Customization::CustomizeChildren(TSharedRef<cla
 							}),
 							FResetToDefaultHandler::CreateLambda([=](TSharedPtr<IPropertyHandle> PropertyHandle)
 								{
-									FCustomCharacterRuntimeData CustomCharacterRuntimeData = FPropertyCustomizeHelper::GetValue<FCustomCharacterRuntimeData>(StructPropertyHandle);
+									FXD_CustomSkeletalRuntimeData CustomCharacterRuntimeData = FPropertyCustomizeHelper::GetValue<FXD_CustomSkeletalRuntimeData>(StructPropertyHandle);
 									if (CustomCharacterRuntimeData.CustomConfig && Idx < CustomCharacterRuntimeData.CustomMaterialTextureValues.Num())
 									{
 										CustomCharacterRuntimeData.CustomMaterialTextureValues[Idx] = CustomCharacterRuntimeData.CustomConfig->MaterialTextureData[Idx].DefaultTexture;

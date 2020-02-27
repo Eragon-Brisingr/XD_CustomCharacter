@@ -15,7 +15,7 @@ public:
 	void CustomizeChildren(TSharedRef<class IPropertyHandle> StructPropertyHandle, class IDetailChildrenBuilder& StructBuilder, IPropertyTypeCustomizationUtils& StructCustomizationUtils) override;
 
 private:
-	TWeakObjectPtr<class UCustomCharacterConfig> Config;
+	TWeakObjectPtr<class UXD_CustomSkeletalConfig> Config;
 };
 
 class FCustomSkeletonBoneData_Customization : public IPropertyTypeCustomizationMakeInstanceable<FCustomSkeletonBoneData_Customization>

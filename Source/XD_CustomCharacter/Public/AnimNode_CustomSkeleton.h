@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimNodeBase.h"
-#include "CustomSkeletonConfig.h"
+#include "XD_CustomSkeletalConfig.h"
 #include "AnimNode_CustomSkeleton.generated.h"
 
 /**
@@ -36,9 +36,9 @@ public:
 	FPoseLink BasePose;
 
 	UPROPERTY(EditAnywhere, Category = "Settings", meta = (PinShownByDefault))
-	FCustomCharacterRuntimeDataRef CustomCharacterRuntimeDataRef;
+	FXD_CustomSkeletalRuntimeDataRef CustomCharacterRuntimeDataRef;
 
-	TWeakObjectPtr<UCustomCharacterConfig> CachedConfig;
+	TWeakObjectPtr<UXD_CustomSkeletalConfig> CachedConfig;
 
 	// FAnimNode_Base interface
 	void Initialize_AnyThread(const FAnimationInitializeContext& Context) override;

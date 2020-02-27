@@ -10,7 +10,7 @@
 
 #define LOCTEXT_NAMESPACE "FXD_CustomCharacter_EditorModule"
 
-struct FCustomCharacterRuntimeData;
+struct FXD_CustomSkeletalRuntimeData;
 struct FCustomSkeletonBoneData;
 struct FCustomMaterialFloatData;
 struct FCustomMaterialTextureData;
@@ -29,7 +29,7 @@ void FXD_CustomCharacter_EditorModule::StartupModule()
 
 	FPropertyEditorModule& PropertyModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
 	{
-		RegisterCustomProperty(FCustomCharacterRuntimeData, FCustomCharacterRuntimeData_Customization);
+		RegisterCustomProperty(FXD_CustomSkeletalRuntimeData, FCustomCharacterRuntimeData_Customization);
 		RegisterCustomProperty(FCustomSkeletonBoneData, FCustomSkeletonBoneData_Customization);
 		RegisterCustomProperty(FCustomMaterialFloatData, FCustomCharacter_HorizontalShow_Customization);
 		RegisterCustomProperty(FCustomMaterialTextureData, FCustomCharacter_HorizontalShow_Customization);
@@ -70,7 +70,7 @@ void FXD_CustomCharacter_EditorModule::ShutdownModule()
 	if (FPropertyEditorModule* PropertyModulePtr = FModuleManager::LoadModulePtr<FPropertyEditorModule>("PropertyEditor"))
 	{
 		FPropertyEditorModule& PropertyModule = *PropertyModulePtr;
-		UnregisterCustomProperty(FCustomCharacterRuntimeData);
+		UnregisterCustomProperty(FXD_CustomSkeletalRuntimeData);
 		UnregisterCustomProperty(FCustomSkeletonBoneData);
 		UnregisterCustomProperty(FCustomMaterialFloatData);
 		UnregisterCustomProperty(FCustomMaterialTextureData);
