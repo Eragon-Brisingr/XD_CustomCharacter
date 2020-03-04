@@ -309,7 +309,7 @@ private:
 	UMaterialInstanceDynamic* GetMID(USkeletalMeshComponent* SkeletalMeshComponent, const FName& SlotName) const;
 };
 
-USTRUCT(BlueprintType, meta = (HasNativeMake = "CustomCharacterFunctionLibrary.MakeCustomCharacterRuntimeDataRef"))
+USTRUCT(BlueprintType, meta = (HasNativeMake = "CustomCharacterFunctionLibrary.MakeCustomSkeletalRuntimeDataRef"))
 struct XD_CUSTOMCHARACTER_API FXD_CustomSkeletalRuntimeDataRef
 {
 	GENERATED_BODY()
@@ -383,5 +383,5 @@ public:
 	static FCustomMaterialTextureEntry GetCustomMaterialTextureConfig(const FXD_CustomSkeletalRuntimeDataRef& Data, int32 Idx) { return Data ? Data->CustomConfig->MaterialTextureData[Idx] : FCustomMaterialTextureEntry(); }
 
 	UFUNCTION(BlueprintPure, Category = "角色|定制", meta = (NativeMakeFunc, CompactNodeTitle = "ToRef", BlueprintAutocast, BlueprintThreadSafe))
-	static FXD_CustomSkeletalRuntimeDataRef MakeCustomCharacterRuntimeDataRef(const FXD_CustomSkeletalRuntimeData& Data) { return FXD_CustomSkeletalRuntimeDataRef(const_cast<FXD_CustomSkeletalRuntimeData&>(Data)); }
+	static FXD_CustomSkeletalRuntimeDataRef MakeCustomSkeletalRuntimeDataRef(const FXD_CustomSkeletalRuntimeData& Data) { return FXD_CustomSkeletalRuntimeDataRef(const_cast<FXD_CustomSkeletalRuntimeData&>(Data)); }
 };

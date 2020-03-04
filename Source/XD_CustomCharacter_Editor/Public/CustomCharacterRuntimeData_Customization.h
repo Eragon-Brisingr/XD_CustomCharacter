@@ -8,9 +8,11 @@
 /**
  *
  */
-class XD_CUSTOMCHARACTER_EDITOR_API FCustomCharacterRuntimeData_Customization : public IPropertyTypeCustomizationMakeInstanceable<FCustomCharacterRuntimeData_Customization>
+class XD_CUSTOMCHARACTER_EDITOR_API FCustomCharacterRuntimeData_Customization : public IPropertyTypeCustomization
 {
 public:
+	static TSharedRef<IPropertyTypeCustomization> MakeInstance() { return MakeShareable(new FCustomCharacterRuntimeData_Customization); }
+
 	void CustomizeHeader(TSharedRef<class IPropertyHandle> StructPropertyHandle, class FDetailWidgetRow& HeaderRow, IPropertyTypeCustomizationUtils& StructCustomizationUtils) override;
 	void CustomizeChildren(TSharedRef<class IPropertyHandle> StructPropertyHandle, class IDetailChildrenBuilder& StructBuilder, IPropertyTypeCustomizationUtils& StructCustomizationUtils) override;
 
