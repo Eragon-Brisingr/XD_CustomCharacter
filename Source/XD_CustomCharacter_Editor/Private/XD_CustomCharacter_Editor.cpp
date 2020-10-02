@@ -5,7 +5,7 @@
 #include <AssetToolsModule.h>
 #include <IAssetTools.h>
 
-#include "XD_PropertyCustomizationEx.h"
+#include "CustomCharacterRuntimeData_Customization.h"
 #include "XD_CustomCharacterFactory.h"
 
 #define LOCTEXT_NAMESPACE "FXD_CustomCharacter_EditorModule"
@@ -29,17 +29,17 @@ void FXD_CustomCharacter_EditorModule::StartupModule()
 
 	FPropertyEditorModule& PropertyModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
 	{
-		RegisterCustomProperty(FXD_CustomSkeletalRuntimeData, FCustomCharacterRuntimeData_Customization);
-		RegisterCustomProperty(FCustomSkeletonBoneData, FCustomSkeletonBoneData_Customization);
-		RegisterCustomProperty(FCustomMaterialFloatData, FCustomCharacter_HorizontalShow_Customization);
-		RegisterCustomProperty(FCustomMaterialTextureData, FCustomCharacter_HorizontalShow_Customization);
-		RegisterCustomProperty(FCustomMaterialColorData, FCustomCharacter_HorizontalShow_Customization);
+		PropertyModule.RegisterCustomPropertyTypeLayout(TEXT("XD_CustomSkeletalRuntimeData"), FOnGetPropertyTypeCustomizationInstance::CreateStatic(&FCustomCharacterRuntimeData_Customization::MakeInstance));
+		PropertyModule.RegisterCustomPropertyTypeLayout(TEXT("CustomSkeletonBoneData"), FOnGetPropertyTypeCustomizationInstance::CreateStatic(&FCustomSkeletonBoneData_Customization::MakeInstance));
+		PropertyModule.RegisterCustomPropertyTypeLayout(TEXT("CustomMaterialFloatData"), FOnGetPropertyTypeCustomizationInstance::CreateStatic(&FCustomCharacter_HorizontalShow_Customization::MakeInstance));
+		PropertyModule.RegisterCustomPropertyTypeLayout(TEXT("CustomMaterialTextureData"), FOnGetPropertyTypeCustomizationInstance::CreateStatic(&FCustomCharacter_HorizontalShow_Customization::MakeInstance));
+		PropertyModule.RegisterCustomPropertyTypeLayout(TEXT("CustomMaterialColorData"), FOnGetPropertyTypeCustomizationInstance::CreateStatic(&FCustomCharacter_HorizontalShow_Customization::MakeInstance));
 
-		RegisterCustomProperty(FCustomSkeletonEntry, FCustomCharacter_ShowNameAndCategory_Customization);
-		RegisterCustomProperty(FCustomMorphEntry, FCustomCharacter_ShowNameAndCategory_Customization);
-		RegisterCustomProperty(FCustomMaterialFloatEntry, FCustomCharacter_ShowNameAndCategory_Customization);
-		RegisterCustomProperty(FCustomMaterialColorEntry, FCustomCharacter_ShowNameAndCategory_Customization);
-		RegisterCustomProperty(FCustomMaterialTextureEntry, FCustomCharacter_ShowNameAndCategory_Customization);
+		PropertyModule.RegisterCustomPropertyTypeLayout(TEXT("CustomSkeletonEntry"), FOnGetPropertyTypeCustomizationInstance::CreateStatic(&FCustomCharacter_ShowNameAndCategory_Customization::MakeInstance));
+		PropertyModule.RegisterCustomPropertyTypeLayout(TEXT("CustomMorphEntry"), FOnGetPropertyTypeCustomizationInstance::CreateStatic(&FCustomCharacter_ShowNameAndCategory_Customization::MakeInstance));
+		PropertyModule.RegisterCustomPropertyTypeLayout(TEXT("CustomMaterialFloatEntry"), FOnGetPropertyTypeCustomizationInstance::CreateStatic(&FCustomCharacter_ShowNameAndCategory_Customization::MakeInstance));
+		PropertyModule.RegisterCustomPropertyTypeLayout(TEXT("CustomMaterialColorEntry"), FOnGetPropertyTypeCustomizationInstance::CreateStatic(&FCustomCharacter_ShowNameAndCategory_Customization::MakeInstance));
+		PropertyModule.RegisterCustomPropertyTypeLayout(TEXT("CustomMaterialTextureEntry"), FOnGetPropertyTypeCustomizationInstance::CreateStatic(&FCustomCharacter_ShowNameAndCategory_Customization::MakeInstance));
 	}
 	
 	IAssetTools& AssetTools = FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools").Get();
@@ -70,17 +70,18 @@ void FXD_CustomCharacter_EditorModule::ShutdownModule()
 	if (FPropertyEditorModule* PropertyModulePtr = FModuleManager::LoadModulePtr<FPropertyEditorModule>("PropertyEditor"))
 	{
 		FPropertyEditorModule& PropertyModule = *PropertyModulePtr;
-		UnregisterCustomProperty(FXD_CustomSkeletalRuntimeData);
-		UnregisterCustomProperty(FCustomSkeletonBoneData);
-		UnregisterCustomProperty(FCustomMaterialFloatData);
-		UnregisterCustomProperty(FCustomMaterialTextureData);
-		UnregisterCustomProperty(FCustomMaterialColorData);
 
-		UnregisterCustomProperty(FCustomSkeletonEntry);
-		UnregisterCustomProperty(FCustomMorphEntry);
-		UnregisterCustomProperty(FCustomMaterialFloatEntry);
-		UnregisterCustomProperty(FCustomMaterialColorEntry);
-		UnregisterCustomProperty(FCustomMaterialTextureEntry);
+		PropertyModule.UnregisterCustomPropertyTypeLayout(TEXT("XD_CustomSkeletalRuntimeData"));
+		PropertyModule.UnregisterCustomPropertyTypeLayout(TEXT("CustomSkeletonBoneData"));
+		PropertyModule.UnregisterCustomPropertyTypeLayout(TEXT("CustomMaterialFloatData"));
+		PropertyModule.UnregisterCustomPropertyTypeLayout(TEXT("CustomMaterialTextureData"));
+		PropertyModule.UnregisterCustomPropertyTypeLayout(TEXT("CustomMaterialColorData"));
+
+		PropertyModule.UnregisterCustomPropertyTypeLayout(TEXT("CustomSkeletonEntry"));
+		PropertyModule.UnregisterCustomPropertyTypeLayout(TEXT("CustomMorphEntry"));
+		PropertyModule.UnregisterCustomPropertyTypeLayout(TEXT("CustomMaterialFloatEntry"));
+		PropertyModule.UnregisterCustomPropertyTypeLayout(TEXT("CustomMaterialColorEntry"));
+		PropertyModule.UnregisterCustomPropertyTypeLayout(TEXT("CustomMaterialTextureEntry"));
 	}
 }
 

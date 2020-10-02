@@ -48,9 +48,6 @@ public class XD_CustomCharacter_Editor : ModuleRules
                 "PropertyEditor",
 
                 "XD_CustomCharacter",
-
-                "XD_UnrealLibraryEx",
-                "XD_UnrealLibraryEx_Editor",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);
